@@ -12,6 +12,16 @@ export const add = (data) => {
         data
     })
 }
+
+// 编辑
+export const edit = (data) => {
+  return axios({
+    url: '/role/edit',
+    method: 'post',
+    data
+  })
+}
+
 // 删除
 export const batchDelete = (params) => {
     return axios({
@@ -44,9 +54,9 @@ export const findRoleMenus = (params) => {
     })
 }
 // 保存角色菜单集合
-export const saveRoleMenus = (data) => {
+export const addRoleMenu = (data) => {
     return axios({
-        url: '/role/add',
+        url: '/role/addRoleMenu',
         method: 'post',
         data
     })

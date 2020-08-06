@@ -57,7 +57,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button :size="size" @click.native="editFlag = false">{{$t('action.cancel')}}</el-button>
-        <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
+        <el-button :size="size" type="primary" @click.native="editSubmitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
       </div>
     </el-dialog>
 
@@ -175,7 +175,7 @@ export default {
 		},
 		// 显示编辑界面
 		handleEdit: function (params) {
-			this.dialogVisible = true
+			this.editFlag = true
 			this.operation = false
 			this.dataForm = Object.assign({}, params.row)
 		},
@@ -201,6 +201,27 @@ export default {
 				}
 			})
 		},
+    editSubmitForm: function () {
+      this.$refs.dataForm.validate((valid) => {
+        if (valid) {
+          this.$confirm('确认提交吗？', '提示', {}).then(() => {
+            this.editLoading = true
+            let params = Object.assign({}, this.dataForm)
+            this.$api.role.edit(params).then((res) => {
+              this.editLoading = false
+              if(res.code == 0) {
+                this.$message({ message: '操作成功', type: 'success' })
+                this.findPage()
+                this.addFlag = false
+                this.$refs['dataForm'].resetFields()
+              } else {
+                this.$message({message: '操作失败, ' + res.msg, type: 'error'})
+              }
+            })
+          })
+        }
+      })
+    },
 		// 获取数据
 		findTreeData: function () {
 			this.menuLoading = true
@@ -242,13 +263,13 @@ export default {
 		},
 		// 全选操作
 		handleCheckAll() {
-			// if(this.checkAll) {
-			// 	let allMenus = []
-			// 	this.checkAllMenu(this.menuData, allMenus)
-			// 	this.$refs.menuTree.setCheckedNodes(allMenus)
-			// } else {
-			// 	this.$refs.menuTree.setCheckedNodes([])
-			// }
+			if(this.checkAll) {
+				let allMenus = []
+				this.checkAllMenu(this.menuData, allMenus)
+				this.$refs.menuTree.setCheckedNodes(allMenus)
+			} else {
+				this.$refs.menuTree.setCheckedNodes([])
+			}
 		},
 		// 递归全选
 		checkAllMenu(menuData, allMenus) {
@@ -270,11 +291,11 @@ export default {
 			let checkedNodes = this.$refs.menuTree.getCheckedNodes(false, true)
 			let roleMenus = []
 			for(let i=0, len=checkedNodes.length; i<len; i++) {
-				let roleMenu = { roleId:roleId, menuId:checkedNodes[i].id }
+				let roleMenu = { roleId:roleId, menuId:checkedNodes[i].id ,createBy:user.name,createTime:(new Date()).getTime()}
 				roleMenus.push(roleMenu)
 			}
-			this.$api.role.saveRoleMenus(roleMenus).then((res) => {
-				if(res.code == 200) {
+			this.$api.role.addRoleMenu(roleMenus).then((res) => {
+				if(res.code == 0) {
 					this.$message({ message: '操作成功', type: 'success' })
 				} else {
 					this.$message({message: '操作失败, ' + res.msg, type: 'error'})
