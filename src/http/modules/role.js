@@ -1,23 +1,23 @@
 import axios from '../axios'
 
-/* 
+/*
  * 角色管理模块
  */
 
 // 保存
-export const save = (data) => {
+export const add = (data) => {
     return axios({
-        url: '/role/save',
+        url: '/role/add',
         method: 'post',
         data
     })
 }
 // 删除
-export const batchDelete = (data) => {
+export const batchDelete = (params) => {
     return axios({
         url: '/role/delete',
-        method: 'post',
-        data
+        method: 'get',
+        params
     })
 }
 // 分页查询
@@ -46,7 +46,7 @@ export const findRoleMenus = (params) => {
 // 保存角色菜单集合
 export const saveRoleMenus = (data) => {
     return axios({
-        url: '/role/saveRoleMenus',
+        url: '/role/add',
         method: 'post',
         data
     })

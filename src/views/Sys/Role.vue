@@ -16,12 +16,15 @@
 	</div>
 	<!--表格内容栏-->
 	<kt-table permsEdit="sys:role:edit" permsDelete="sys:role:delete" :highlightCurrentRow="true" :stripe="false"
-		:data="pageResult" :columns="columns" :showBatchDelete="false" @handleCurrentChange="handleRoleSelectChange"
-		@findPage="findPage" @handleEdit="handleEdit" @handleDelete="handleDelete">
+		:data="pageResult" :columns="columns" :showBatchDelete="false"
+            @handleCurrentChange="handleRoleSelectChange"
+		        @findPage="findPage"
+            @handleEdit="handleEdit"
+            @handleDelete="handleDelete">
 	</kt-table>
 	<!-- </el-col> -->
 	<!--新增编辑界面-->
-	<el-dialog :title="operation?'新增':'编辑'" width="40%" :visible.sync="dialogVisible" :close-on-click-modal="false">
+	<el-dialog title="新增" width="40%" :visible.sync="addFlag" :close-on-click-modal="false">
 		<el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size">
 			<el-form-item label="ID" prop="id" v-if="false">
 				<el-input v-model="dataForm.id" :disabled="true" auto-complete="off"></el-input>
@@ -34,10 +37,31 @@
 			</el-form-item>
 		</el-form>
 		<div slot="footer" class="dialog-footer">
-			<el-button :size="size" @click.native="dialogVisible = false">{{$t('action.cancel')}}</el-button>
+			<el-button :size="size" @click.native="addFlag = false">{{$t('action.cancel')}}</el-button>
 			<el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
 		</div>
 	</el-dialog>
+
+    <!--新增编辑界面-->
+    <el-dialog title="编辑" width="40%" :visible.sync="editFlag" :close-on-click-modal="false">
+      <el-form :model="dataForm" label-width="80px" :rules="dataFormRules" ref="dataForm" :size="size">
+        <el-form-item label="ID" prop="id" v-if="false">
+          <el-input v-model="dataForm.id" :disabled="true" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="角色名" prop="name">
+          <el-input v-model="dataForm.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="备注 " prop="remark">
+          <el-input v-model="dataForm.remark" auto-complete="off" type="textarea"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button :size="size" @click.native="editFlag = false">{{$t('action.cancel')}}</el-button>
+        <el-button :size="size" type="primary" @click.native="submitForm" :loading="editLoading">{{$t('action.submit')}}</el-button>
+      </div>
+    </el-dialog>
+
+
 	<!--角色菜单，表格树内容栏-->
 	<div class="menu-container" :v-if="true">
 		<div class="menu-header">
@@ -52,9 +76,9 @@
 			<el-checkbox v-model="checkAll" @change="handleCheckAll" :disabled="this.selectRole.id == null"><b>全选</b></el-checkbox>
 		</div>
 		<div style="float:right;padding-right:15px;padding-top:4px;padding-bottom:4px;">
-			<kt-button :label="$t('action.reset')" perms="sys:role:edit" type="primary" @click="resetSelection" 
+			<kt-button :label="$t('action.reset')" perms="sys:role:edit" type="primary" @click="resetSelection"
 				:disabled="this.selectRole.id == null"/>
-			<kt-button :label="$t('action.submit')" perms="sys:role:edit" type="primary" @click="submitAuthForm" 
+			<kt-button :label="$t('action.submit')" perms="sys:role:edit" type="primary" @click="submitAuthForm"
 				:disabled="this.selectRole.id == null" :loading="authLoading"/>
 		</div>
 	</div>
@@ -66,6 +90,8 @@ import KtTable from "@/views/Core/KtTable"
 import KtButton from "@/views/Core/KtButton"
 import TableTreeColumn from '@/views/Core/TableTreeColumn'
 import { format } from "@/utils/datetime"
+import {getUserInfo} from "../../utils/Auth";
+var user=JSON.parse(getUserInfo())
 export default {
 	components:{
 		KtTable,
@@ -83,15 +109,17 @@ export default {
 				{prop:"name", label:"角色名", minWidth:120},
 				{prop:"remark", label:"备注", minWidth:120},
 				{prop:"createBy", label:"创建人", minWidth:120},
-				{prop:"createTime", label:"创建时间", minWidth:120, formatter:this.dateFormat}
-				// {prop:"lastUpdateBy", label:"更新人", minWidth:100},
-				// {prop:"lastUpdateTime", label:"更新时间", minWidth:120, formatter:this.dateFormat}
+				{prop:"createTime", label:"创建时间", minWidth:120, formatter:this.dateFormat},
+				{prop:"lastUpdateBy", label:"更新人", minWidth:100},
+				{prop:"lastUpdateTime", label:"更新时间", minWidth:120, formatter:this.dateFormat}
 			],
-			pageRequest: { pageNum: 1, pageSize: 10 },
+			pageRequest: {},
 			pageResult: {},
 
 			operation: false, // true:新增, false:编辑
 			dialogVisible: false, // 新增编辑界面是否显示
+      addFlag:false,
+      editFlag:false,
 			editLoading: false,
 			dataFormRules: {
 				name: [
@@ -102,7 +130,8 @@ export default {
 			dataForm: {
 				id: 0,
 				name: '',
-				remark: ''
+				remark: '',
+        createBy:user.name
 			},
 			selectRole: {},
 			menuData: [],
@@ -120,10 +149,10 @@ export default {
 	methods: {
 		// 获取分页数据
 		findPage: function (data) {
-			if(data !== null) {
-				this.pageRequest = data.pageRequest
-			}
-			this.pageRequest.params = [{name:'name', value:this.filters.name}]
+      if (data !== null) {
+        this.pageRequest = data.pageRequest
+      }
+      this.pageRequest.name = this.filters.name
 			this.$api.role.findPage(this.pageRequest).then((res) => {
 				this.pageResult = res.data
 				this.findTreeData()
@@ -131,17 +160,18 @@ export default {
 		},
 		// 批量删除
 		handleDelete: function (data) {
-			this.$api.role.batchDelete(data.params).then(data.callback)
+			this.$api.role.batchDelete({id:new Number(data.params[0].id)}).then(data.callback)
 		},
 		// 显示新增界面
 		handleAdd: function () {
-			this.dialogVisible = true
-			this.operation = true
+			this.addFlag = true
 			this.dataForm = {
 				id: 0,
 				name: '',
-				remark: ''
+				remark: '',
+        createBy:user.name
 			}
+
 		},
 		// 显示编辑界面
 		handleEdit: function (params) {
@@ -156,16 +186,16 @@ export default {
 					this.$confirm('确认提交吗？', '提示', {}).then(() => {
 						this.editLoading = true
 						let params = Object.assign({}, this.dataForm)
-						this.$api.role.save(params).then((res) => {
+						this.$api.role.add(params).then((res) => {
 							this.editLoading = false
-							if(res.code == 200) {
+							if(res.code == 0) {
 								this.$message({ message: '操作成功', type: 'success' })
-								this.dialogVisible = false
+								this.addFlag = false
 								this.$refs['dataForm'].resetFields()
 							} else {
 								this.$message({message: '操作失败, ' + res.msg, type: 'error'})
 							}
-							this.findPage(null)
+							this.findPage()
 						})
 					})
 				}
@@ -185,7 +215,7 @@ export default {
 				return
 			}
 			this.selectRole = val.val
-			this.$api.role.findRoleMenus({'roleId':val.val.id}).then((res) => {
+			this.$api.role.findRoleMenus({'id':val.val.id}).then((res) => {
 				this.currentRoleMenus = res.data
 				this.$refs.menuTree.setCheckedNodes(res.data)
 			})
@@ -212,13 +242,13 @@ export default {
 		},
 		// 全选操作
 		handleCheckAll() {
-			if(this.checkAll) {
-				let allMenus = []
-				this.checkAllMenu(this.menuData, allMenus)
-				this.$refs.menuTree.setCheckedNodes(allMenus)
-			} else {
-				this.$refs.menuTree.setCheckedNodes([])
-			}
+			// if(this.checkAll) {
+			// 	let allMenus = []
+			// 	this.checkAllMenu(this.menuData, allMenus)
+			// 	this.$refs.menuTree.setCheckedNodes(allMenus)
+			// } else {
+			// 	this.$refs.menuTree.setCheckedNodes([])
+			// }
 		},
 		// 递归全选
 		checkAllMenu(menuData, allMenus) {
@@ -270,7 +300,7 @@ export default {
       	dateFormat: function (row, column, cellValue, index){
           	return format(row[column.property])
       	}
-		
+
 	},
 	mounted() {
 	}
@@ -286,6 +316,6 @@ export default {
 	text-align: left;
 	font-size: 16px;
 	color: rgb(20, 89, 121);
-	
+
 }
 </style>
