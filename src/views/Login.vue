@@ -75,7 +75,8 @@
             this.loading = false
             this.$router.push('/')  // 登录成功，跳转到主页
           }else{
-            // alert(res.msg)
+            alert(res.msg)
+            this.loading = false
           }
         }).catch((res) => {
           this.$message({ message: res.message, type: 'error' })

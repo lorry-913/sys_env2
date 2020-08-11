@@ -131,7 +131,7 @@ export default {
 				id: 0,
 				name: '',
 				remark: '',
-        createBy:user.name
+        createBy:""
 			},
 			selectRole: {},
 			menuData: [],
@@ -192,10 +192,11 @@ export default {
 								this.$message({ message: '操作成功', type: 'success' })
 								this.addFlag = false
 								this.$refs['dataForm'].resetFields()
+                this.findPage(null);
 							} else {
 								this.$message({message: '操作失败, ' + res.msg, type: 'error'})
 							}
-							this.findPage()
+              this.findPage(null)
 						})
 					})
 				}
@@ -207,12 +208,13 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.editLoading = true
             let params = Object.assign({}, this.dataForm)
+            params.lastUpdateBy=user.name
             this.$api.role.edit(params).then((res) => {
               this.editLoading = false
               if(res.code == 0) {
                 this.$message({ message: '操作成功', type: 'success' })
-                this.findPage()
-                this.addFlag = false
+                this.findPage(null)
+                this.editFlag = false
                 this.$refs['dataForm'].resetFields()
               } else {
                 this.$message({message: '操作失败, ' + res.msg, type: 'error'})

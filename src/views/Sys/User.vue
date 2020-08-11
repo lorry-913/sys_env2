@@ -140,7 +140,9 @@
   import TableColumnFilterDialog from "@/views/Core/TableColumnFilterDialog"
   import {formatDate} from "../../utils/datetime";
   import {format} from "../../utils/datetime";
+  import {getUserInfo} from "../../utils/Auth";
 
+  var user=JSON.parse(getUserInfo())
   export default {
     components: {
       PopupTreeInput,
@@ -185,11 +187,12 @@
         dataForm: {
           id: 0,
           name: '',
-          password: '123456',
+          password: '',
           deptId: 1,
           deptName: '',
-          email: 'test@qq.com',
-          mobile: '13889700023',
+          lastUpdateBy:"",
+          email: '',
+          mobile: '',
           status: 1,
           userRoles: []
         },
@@ -241,6 +244,7 @@
         	password: '',
         	deptId: 1,
         	deptName: '',
+          createBy:user.name,
         	email: '',
         	mobile: '',
         	status: 1,
@@ -249,6 +253,7 @@
       },
       // 显示编辑界面
       handleEdit: function (params) {
+        this.dataForm.lastUpdateBy=user.name
         this.editDialogVisible = true
         this.operation2 = true
         this.dataForm = Object.assign({}, params.row)
@@ -265,6 +270,7 @@
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addDialogVisible = true
               let params = Object.assign({}, this.dataForm)
+              alert(JSON.stringify(params))
               this.$api.user.save(params).then((res) => {
                 this.addDialogVisible = false
                 if (res.code == 0) {
@@ -286,6 +292,7 @@
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.editDialogVisible = true
+              this.dataForm.lastUpdateBy=user.name
               let params = Object.assign({}, this.dataForm)
               let userRoles = []
               //角色和部门一一对应
@@ -297,13 +304,13 @@
                 userRoles.push(userRole)
               }
               params.userRoles = userRoles
-              console.log(JSON.stringify(params))
+              alert(JSON.stringify(params))
               this.$api.user.edit(params).then((res) => {
                 this.addDialogVisible = false
                 if (res.code == 0) {
                   this.$message({message: '操作成功', type: 'success'})
-                  this.dialogVisible = false
-                  // this.$refs['dataForm'].resetFields()
+                  this.editDialogVisible = false
+                  this.$refs['dataForm'].resetFields()
                 } else {
                   this.$message({message: '操作失败, ' + res.msg, type: 'error'})
                 }

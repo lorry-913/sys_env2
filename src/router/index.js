@@ -83,7 +83,7 @@ function addDynamicMenuAndRoutes(userName, to, from) {
     router.options.routes[0].children = router.options.routes[0].children.concat(dynamicRoutes)
     router.addRoutes(router.options.routes)
     // 保存加载状态
-    store.commit('menuRouteLoaded', true)
+    store.commit('menuRouteLoaded', false)
     // 保存菜单树
     store.commit('setNavTree', res.data)
   }).then(res=>{
