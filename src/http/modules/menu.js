@@ -12,6 +12,15 @@ export const save = (data) => {
         data
     })
 }
+
+export const edit = (data) => {
+  return axios({
+    url: '/menu/edit',
+    method: 'post',
+    data
+  })
+}
+
 // 删除
 export const batchDelete = (data) => {
     return axios({

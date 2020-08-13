@@ -48,3 +48,13 @@ export const findPermissions = (params) => {
         params
     })
 }
+
+
+// 查找用户的菜单权限标识集合
+export const getUserExcle = (data) => {
+  return axios({
+    url: '/user/getUserExcel',
+    method: 'post',
+    data
+  })
+}

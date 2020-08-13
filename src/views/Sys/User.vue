@@ -28,7 +28,7 @@
               <el-button icon="fa fa-filter" @click="displayFilterColumnsDialog"></el-button>
             </el-tooltip>
             <el-tooltip content="导出" placement="top">
-              <el-button icon="fa fa-file-excel-o"></el-button>
+              <el-button icon="fa fa-file-excel-o" @click="getUserExcle"></el-button>
             </el-tooltip>
           </el-button-group>
         </el-form-item>
@@ -344,6 +344,11 @@
         this.filterColumns = data.filterColumns
         this.$refs.tableColumnFilterDialog.setDialogVisible(false)
       },
+      getUserExcle:function (data) {
+        let url="http://localhost:8002/user/getUserExcel?page=1&page_len=10000"
+        if(this.filters.name!="") url=url+"&name="+this.filters.name
+        window.location.href =url
+      }
     },
     mounted() {
       this.findDeptTree()

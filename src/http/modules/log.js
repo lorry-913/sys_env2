@@ -15,7 +15,7 @@ export const batchDelete = (data) => {
 // 分页查询
 export const findPage = (data) => {
     return axios({
-        url: '/log/findPage',
+        url: '/logger/findPage',
         method: 'post',
         data
     })

@@ -299,11 +299,11 @@ export default {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
           this.$confirm("确认提交吗？", "提示", {}).then(() => {
-            this.editLoading = true;
+            this.addFlag = true;
             let params = Object.assign({}, this.dataForm);
             this.$api.menu.save(params).then(res => {
-              this.editLoading = false;
-              if (res.code == 200) {
+              this.addFlag = false;
+              if (res.code == 0) {
                 this.$message({ message: "操作成功", type: "success" });
                 this.$refs["dataForm"].resetFields();
                 this.dialogVisible = false;
@@ -325,9 +325,9 @@ export default {
           this.$confirm("确认提交吗？", "提示", {}).then(() => {
             this.editLoading = true;
             let params = Object.assign({}, this.dataForm);
-            this.$api.menu.save(params).then(res => {
+            this.$api.menu.edit(params).then(res => {
               this.editLoading = false;
-              if (res.code == 200) {
+              if (res.code == 0) {
                 this.$message({ message: "操作成功", type: "success" });
                 this.$refs["dataForm"].resetFields();
                 this.dialogVisible = false;

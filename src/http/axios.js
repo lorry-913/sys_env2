@@ -5,11 +5,15 @@ import router from '@/router'
 
 export default function $axios(options) {
   return new Promise((resolve, reject) => {
+    if(options.url==="/user/getUserExcel"){
+      config.responseType="blob"
+    }
     const instance = axios.create({
       baseURL: config.baseUrl,
       headers: config.headers,
       timeout: config.timeout,
-      withCredentials: config.withCredentials
+      withCredentials: config.withCredentials,
+      responseType: config.responseType,
     })
     // request 请求拦截器
     instance.interceptors.request.use(
@@ -48,6 +52,9 @@ export default function $axios(options) {
     // response 响应拦截器
     instance.interceptors.response.use(
       response => {
+        // if(options.url==="/user/getUserExcel"){
+        //     alert(response)
+        // }
         return response.data
       },
       err => {
@@ -101,4 +108,14 @@ export default function $axios(options) {
       reject(error)
     })
   })
+}
+
+const downloadUrl = url => {
+  let iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  iframe.src = url
+  iframe.onload = function () {
+    document.body.removeChild(iframe)
+  }
+  document.body.appendChild(iframe)
 }
