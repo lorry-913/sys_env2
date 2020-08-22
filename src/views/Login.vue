@@ -67,7 +67,7 @@
         // alert(JSON.stringify(userInfo))
         this.$api.login.login(userInfo).then((res) => {  // 调用登录接口
           // sessionStorage.setItem("user",res.data)
-          this.$message.info(JSON.stringify(res.data))
+          // this.$message.info(JSON.stringify(res.data))
           if(res.code==0){
             Cookies.set('token', res.data.token) // 放置token到Cookie
             setUserCookie(userInfo.name)

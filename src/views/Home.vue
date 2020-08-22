@@ -35,7 +35,7 @@ export default {
     },
     testAxios() {
       this.$api.user.getUser().then(res=>{
-        alert(res)
+        // alert(res)
       })
     },
     getUser() {

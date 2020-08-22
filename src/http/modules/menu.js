@@ -38,11 +38,11 @@ export const findNavTree = (params) => {
     })
 }
 // 查找导航菜单树
-export const findMenuTree = (data) => {
+export const findMenuTree = (params) => {
     return axios({
         url: '/menu/findMenuTree',
         method: 'get',
-        data
+        params
     })
 }
 

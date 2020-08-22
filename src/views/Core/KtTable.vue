@@ -1,9 +1,20 @@
 <template>
   <div>
     <!--表格栏-->
-    <el-table :data="data.resultList" :highlight-current-row="highlightCurrentRow" @selection-change="selectionChange"
-              @current-change="handleCurrentChange" v-loading="loading" :element-loading-text="$t('action.loading')" :border="border" :stripe="stripe"
-              :show-overflow-tooltip="showOverflowTooltip" :max-height="maxHeight" :size="size" :align="align" style="width:100%;" >
+    <el-table :data="data.resultList"
+              :highlight-current-row="highlightCurrentRow"
+              @selection-change="selectionChange"
+              @current-change="handleCurrentChange"
+              @row-dblclick="handDoubleclick"
+              v-loading="loading"
+              :element-loading-text="$t('action.loading')"
+              :border="border"
+              :stripe="stripe"
+              :show-overflow-tooltip="showOverflowTooltip"
+              :max-height="maxHeight" :size="size"
+              :align="align"
+              :cell-style="tableCellStyle"
+              style="width:100%;" >
       <el-table-column type="selection" width="40" v-if="showBatchDelete & showOperation"></el-table-column>
       <el-table-column v-for="column in columns" header-align="center" align="center"
                        :prop="column.prop" :label="column.label" :width="column.width" :min-width="column.minWidth"
@@ -40,6 +51,7 @@
       data: Object, // 表格分页数据
       permsEdit: String,  // 编辑权限标识
       permsDelete: String,  // 删除权限标识
+      permsDetail:String,
       size: { // 尺寸样式
         type: String,
         default: 'mini'
@@ -101,9 +113,15 @@
         this.selections = selections
         this.$emit('selectionChange', {selections:selections})
       },
+      tableCellStyle ({row, rowIndex, column,cindex}) {
+          this.$emit("tableCellStyle",{row, rowIndex, column,cindex})
+      },
       // 选择切换
       handleCurrentChange: function (val) {
         this.$emit('handleCurrentChange', {val:val})
+      },
+      handDoubleclick:function (val){
+        this.$emit('handDoubleclick', {val:val})
       },
       // 换页刷新
       refreshPageRequest: function (page) {
@@ -117,6 +135,9 @@
       // 删除
       handleDelete: function (index, row) {
         this.delete(row.id)
+      },
+      handleDetail: function (index, row) {
+        this.$emit('handleDetail', {index:index, row:row})
       },
       // 批量删除
       handleBatchDelete: function () {
@@ -150,6 +171,7 @@
     },
     mounted() {
       this.refreshPageRequest(1)
+      this.setCellStyle
     }
   }
 </script>

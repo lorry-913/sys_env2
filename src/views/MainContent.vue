@@ -91,9 +91,9 @@
         })
       }
     },
-    watch:{
-      $route:"handRoute"
-    }
+    // watch:{
+    //   $route:"handRoute"
+    // }
   }
 </script>
 

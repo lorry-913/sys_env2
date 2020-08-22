@@ -7,14 +7,15 @@ import Intro from '@/views/Intro/Intro'
 import api from '@/http/api'
 import {getUserCookie} from "../utils/Auth";
 import store from '@/store/index'
-import { getIFramePath, getIFrameUrl } from '@/utils/iframe'
+import {getIFramePath, getIFrameUrl} from '@/utils/iframe'
+
 Vue.use(Router)
 
 const router = new Router({
   routes: [
     {
       path: '/',
-      name: 'Home',
+      // name: 'Home',
       component: Home,
       children: [
         {
@@ -72,10 +73,10 @@ function addDynamicMenuAndRoutes(userName, to, from) {
     console.log('动态菜单和路由已经存在.')
     return
   }
-  let menuParams={
-    name:userName
+  let menuParams = {
+    name: userName
   }
-  api.menu.findNavTree(menuParams).then(res=>{
+  api.menu.findNavTree(menuParams).then(res => {
     console.log("/menu/findNavTree")
     console.log(JSON.stringify(res.data))
     let dynamicRoutes = addDynamicRoutes(res.data)
@@ -87,14 +88,14 @@ function addDynamicMenuAndRoutes(userName, to, from) {
     store.commit('menuRouteLoaded', false)
     // 保存菜单树
     store.commit('setNavTree', res.data)
-  }).then(res=>{
-      api.user.findPermissions({'name': userName}).then(res => {
-        // 保存用户权限标识集合
-        console.log("权限 增删改查")
-        console.log("/user/findPermissions")
-        console.log(JSON.stringify(res.data))
-        store.commit('setPerms', res.data)
-      })
+  }).then(res => {
+    api.user.findPermissions({'name': userName}).then(res => {
+      // 保存用户权限标识集合
+      console.log("权限 增删改查")
+      console.log("/user/findPermissions")
+      console.log(JSON.stringify(res.data))
+      store.commit('setPerms', res.data)
+    })
   })
 }
 
@@ -103,7 +104,7 @@ function addDynamicMenuAndRoutes(userName, to, from) {
  * @param {*} menuList 菜单列表
  * @param {*} routes 递归创建的动态(菜单)路由
  */
-function addDynamicRoutes (menuList = [], routes = []) {
+function addDynamicRoutes(menuList = [], routes = []) {
   var temp = []
   for (var i = 0; i < menuList.length; i++) {
     if (menuList[i].children && menuList[i].children.length >= 1) {
@@ -127,7 +128,7 @@ function addDynamicRoutes (menuList = [], routes = []) {
         route['component'] = resolve => require([`@/views/IFrame/IFrame`], resolve)
         // 存储嵌套页面路由路径和访问URL
         let url = getIFrameUrl(menuList[i].url)
-        let iFrameUrl = {'path':path, 'url':url}
+        let iFrameUrl = {'path': path, 'url': url}
         store.commit('addIFrameUrl', iFrameUrl)
       } else {
         try {
@@ -135,12 +136,13 @@ function addDynamicRoutes (menuList = [], routes = []) {
           // 如url="sys/user"，则组件路径应是"@/views/sys/user.vue",否则组件加载不到
           let array = menuList[i].url.split('/')
           let url = ''
-          for(let i=0; i<array.length; i++) {
-            url += array[i].substring(0,1).toUpperCase() + array[i].substring(1) + '/'
+          for (let i = 0; i < array.length; i++) {
+            url += array[i].substring(0, 1).toUpperCase() + array[i].substring(1) + '/'
           }
           url = url.substring(0, url.length - 1)
           route['component'] = resolve => require([`@/views/${url}`], resolve)
-        } catch (e) {}
+        } catch (e) {
+        }
       }
       routes.push(route)
     }
@@ -156,8 +158,6 @@ function addDynamicRoutes (menuList = [], routes = []) {
 }
 
 
-
-
 /**
  * 处理IFrame嵌套页面
  */
@@ -165,9 +165,9 @@ function handleIFrameUrl(path) {
   // 嵌套页面，保存iframeUrl到store，供IFrame组件读取展示
   let url = path
   let length = store.state.iframe.iframeUrls.length
-  for(let i=0; i<length; i++) {
+  for (let i = 0; i < length; i++) {
     let iframe = store.state.iframe.iframeUrls[i]
-    if(path != null && path.endsWith(iframe.path)) {
+    if (path != null && path.endsWith(iframe.path)) {
       url = iframe.url
       store.commit('setIFrameUrl', url)
       break

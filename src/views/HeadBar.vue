@@ -123,7 +123,6 @@
     mounted() {
       // var user =  Cookies.get("user")
       var user=JSON.parse(getUserInfo())
-      console.log(JSON.stringify(user))
       if (user) {
         this.user.name = user.name
         this.user.avatar = require("@/assets/user.png")
