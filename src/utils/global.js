@@ -6,10 +6,10 @@
 
  // 后台管理系统服务器地址
 // export const baseUrl = 'http://139.196.87.48:8001'
-export const baseUrl = 'http://localhost:8002'
+export const baseUrl = 'http://47.114.191.14:8002'
  // 系统数据备份还原服务器地址
 // export const backupBaseUrl = 'http://139.196.87.48:8002'
-export const backupBaseUrl = 'http://localhost:8099'
+export const backupBaseUrl = 'http://47.114.191.14:8099'
 
 export default {
     baseUrl,
